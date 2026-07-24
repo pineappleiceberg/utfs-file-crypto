@@ -164,14 +164,39 @@ return XCP_OK;
 
 
 
+static int xcp_counter_range_available(uint32_t counter, size_t length){
+
+const size_t whole_blocks = length / XCP_CHACHA20_BLOCK_SIZE;
+const size_t remainder = length %  XCP_CHACHA20_BLOCK_SIZE;
+uint64_t blocks_needed;
+uint64_t blocks_available;
+
+
+if (whole_blocks > UINT32_MAX){
+return 0;
+}
+blocks_needed = (uint64_t)whole_blocks + (remainder != 0u ? 1u : 0u);
+blocks_available = (UINT64_C(1) << 32) - (uint64_t)counter;
+
+return blocks_needed <= blocks_available;
+}
+
+
+
+
 xcp_result_t xcp_chacha20_xor(const uint8_t key[XCP_CHACHA20_KEY_SIZE],
                               uint32_t counter, 
                               const uint8_t nonce[XCP_CHACHA20_NONCE_SIZE],
                               const uint8_t *input,
                               uint8_t *output,
                               size_t length){
-if(key ==NULL || nonce == NULL || input == NULL || output == NULL){
-return XCP_PARAM_ERROR;
+if (key == NULL || nonce == NULL || ((input == NULL || output == NULL) && length != 0u )){
+    return XCP_PARAM_ERROR;
+}
+
+if (!xcp_counter_range_available(counter, length)) {
+return XCP_COUNTER_EXHAUSTED;
+
 }
 
 uint8_t block[XCP_CHACHA20_BLOCK_SIZE];
@@ -192,7 +217,6 @@ return XCP_PARAM_ERROR;
 }
 
 
-counter++;
 
 
 for (i = 0; i < take; i++){
@@ -201,6 +225,11 @@ output[offset + i] = (uint8_t)(input[offset+i] ^ block[i]);
 
 }
 offset += take;
+
+if (offset < length) {
+counter++;
+}
+
 
 }
 memset(block, 0 ,sizeof(block));

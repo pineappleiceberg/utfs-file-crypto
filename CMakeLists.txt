@@ -34,3 +34,9 @@ target_link_libraries(xcp_chacha20_block_test PRIVATE xcp)
 add_test(NAME xcp_chacha20_block_test
 COMMAND xcp_chacha20_block_test)
 
+add_executable(xcp_chacha20_xor_limit_test
+tests/chacha20_xor_limit_test.c)
+
+target_link_libraries(xcp_chacha20_xor_limit_test PRIVATE xcp)
+
+add_test(NAME xcp_chacha20_xor_limit_test COMMAND xcp_chacha20_xor_limit_test)
