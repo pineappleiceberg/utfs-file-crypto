@@ -7,6 +7,16 @@ set(CMAKE_C_STANDARD 99)
 
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
+option(XCP_ENABLE_ASAN "builds with address sanitizer" OFF)
+
+if(XCP_ENABLE_ASAN)
+ if(NOT CMAKE_C_COMPILER_ID STREQUAL "GNU")
+  message(FATAL_ERROR "XCP_ENABLE_ASAN requires GCC")
+ endif()
+add_compile_options(-fsanitize=address -fno-omit-frame-pointer)
+
+add_link_options(-fsanitize=address)
+endif()
 
 add_library(
 xcp
