@@ -39,9 +39,6 @@ void xcp_chacha20_quarter_round(uint32_t state[16],
                                 unsigned d);
 
 
-static void chacha20_rounds(uint32_t state[16]);
-
-static void chacha20_inital_state(uint32_t state[16], const uint8_t key[XCP_CHACHA20_KEY_SIZE], uint32_t counter, const uint8_t nonce[XCP_CHACHA20_NONCE_SIZE]);
 
 xcp_result_t xcp_chacha20_block(const uint8_t key[XCP_CHACHA20_KEY_SIZE],
                                 uint32_t counter,
